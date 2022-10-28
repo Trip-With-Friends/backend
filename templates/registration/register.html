@@ -1,0 +1,49 @@
+{% extends 'layout/layout.html' %}
+
+{% load static %}
+
+{% block title %}Регистрация{% endblock title %}
+
+{% block header %}Регистрация{% endblock header %}
+
+{% block nav %}
+    <li>
+        <a href="{% url 'login_select' %}">Войти в аккаунт</a>
+    </li>
+{% endblock nav %}
+
+{% block content %}
+<form method="post">
+    {{ form.surname }}
+    {{ form.name }}
+    {{ form.patronymic }}
+    {{ form.birthdate }}
+    {{ form.email }}
+    {{ form.phonenum }}
+    {{ form.region }}
+
+    <h3>Добавить</h3>
+
+    <button id='btn add-city' type='button'>город</button>
+    <button id='btn add-village' type='button'>село/деревню</button>
+
+    <select id='liveplace-select'>
+        {% comment %} options adds in register.js after click on 'btn add-city/village' {% endcomment %}
+    </select>
+
+    {{ form.liveplace }}
+
+    {{ form.password1 }}
+    {{ form.password2 }}
+
+    {{ form.allow_politics_and_processing }}
+
+    {% comment %} <input id='allow-data-proc' type='checkbox'> Я соглашаюсь на обработку личных данных.
+    <input id='allow-politics' type='checkbox'> Я соглашаюсь с политикой конфиденциальности {% endcomment %}
+
+    <button type="submit">submit</button>
+    {% csrf_token %}
+</form>
+
+<script type='module' src="{% static 'js/register.js' %}"></script>
+{% endblock content %}

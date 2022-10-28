@@ -1,0 +1,16 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}Выбор способа регистрации{% endblock title %}
+
+{% block header %}Выбор способа регистрации{% endblock header %}
+
+{% block nav %}
+    <ul>
+        <a href="{% url 'register' %}">Создать аккаунт</a>
+    </ul>
+{% endblock nav %}
+
+{% block content %}
+<a href="{% url 'login' login_method='phonenum' %}">Войти по номеру телефона</a>
+<a href="{% url 'login' login_method='email' %}">Войти по email</a>
+{% endblock content %}

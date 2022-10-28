@@ -1,0 +1,15 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}Удаление аккаунта{% endblock title %}
+
+{% block header %}Удаление аккаунта{% endblock header %}
+
+{% block content %}
+    <form method="post">
+        Вы точно хотите удалить аккаунт? В дальнейшем, его нельзя будет восстановить.
+        <button type='submit'>Да, хочу</button>
+        {% csrf_token %}
+    </form>
+
+    <a href="{% url 'home' %}">Вернуться на главную</a>
+{% endblock content %}

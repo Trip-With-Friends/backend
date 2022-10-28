@@ -1,0 +1,27 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}Вход в аккаунт{% endblock title %}
+
+{% block nav %}
+    <ul>
+        <a href="{% url 'register' %}">Создать аккаунт</a>
+    </ul>
+{% endblock nav %}
+
+{% block content %}
+
+<form method="post">
+    {% if login_method == "email" %}
+        {{ form.email }}
+    {% endif %}
+
+    {% if login_method == "phonenum" %}
+        {{ form.phonenum }}
+    {% endif %}
+
+    {{ form.password }}
+    
+    {% csrf_token %}
+    <button type="submit">submit</button>
+</form>
+{% endblock content %}
