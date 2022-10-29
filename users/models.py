@@ -1,12 +1,13 @@
 import os
 from datetime import datetime
 from uuid import uuid4
-from phonenumber_field.modelfields import PhoneNumberField
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.dispatch import receiver
 
-from russian_regions_and_cities.cortage_generator import *
+from phonenumber_field.modelfields import PhoneNumberField
+from russian_regions_and_cities.regions_utils import *
 
 
 class User(AbstractUser):
@@ -17,7 +18,8 @@ class User(AbstractUser):
         max_length=50, blank=True, null=True, default='')
     birthdate = models.DateField(
         editable=True, null=False, default='2000-01-01')
-    photo = models.ImageField(null=True, upload_to='users_thumbnails')
+    photo = models.ImageField(null=True,
+                              upload_to='users_thumbnails')
 
     email = models.EmailField(unique=True)
     phonenum = PhoneNumberField(region=None, unique=True)
@@ -29,10 +31,14 @@ class User(AbstractUser):
         default=''
     )
 
-    liveplace = models.CharField(max_length=50, blank=False, default='')
-    description = models.TextField(blank=True, max_length=1000)
-    not_twf_exp = models.TextField(blank=True, max_length=1000)
-    allow_politics_and_processing = models.BooleanField(default=False)
+    liveplace = models.CharField(
+        max_length=50, blank=False, default='')
+    description = models.TextField(
+        blank=True, max_length=1000)
+    not_twf_exp = models.TextField(
+        blank=True, max_length=1000)
+    allow_politics_and_processing = models.BooleanField(
+        default=False)
 
     def get_age(self) -> int:
         today = datetime.now().date()

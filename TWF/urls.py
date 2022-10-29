@@ -1,6 +1,5 @@
 from django.contrib import admin
-from django.urls import include, path
-
+from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -11,7 +10,6 @@ from home import views as home_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_views.home, name='home'),
-    # path('', include('django.contrib.auth.urls')),
     path('register', users_views.register, name='register'),
     path('register2', users_views.user_append, name='append_user'),
     path('cabinet', users_views.cabinet, name='cabinet'),

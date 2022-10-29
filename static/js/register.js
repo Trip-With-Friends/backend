@@ -1,4 +1,4 @@
-import { gen_cities_list, reg_full_name } from './regions_and_cities/list_generator.js'
+import { gen_cities_list, reg_full_name } from './regions_and_cities/regions_utils.js'
 
 const city_btn = document.getElementById('btn add-city')
 const village_btn = document.getElementById('btn add-village')

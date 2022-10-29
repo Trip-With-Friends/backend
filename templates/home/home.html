@@ -7,13 +7,8 @@
 {% block content %}
 <h3>Добро пожаловать!</h3>
 
-{% comment %} {% if user.is_authenticated %} {% endcomment %}
 <a href="{% url 'cabinet' %}">Личный кабинет</a>
 <a href="{% url 'logout' %}">Выйти из аккаунта</a>
 <a href="{% url 'delete_user' %}">Удалить аккаунт</a>
-{% comment %} {% else %}
-<a href="{% url 'login' %}">Войти в аккаунт</a>
-<a href="{% url 'register' %}">Создать аккаунт</a>
-{% endif %} {% endcomment %}
 
 {% endblock content %}
