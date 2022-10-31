@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from os import path
 from pathlib import Path
 
-from SECRET_KEY import SECRET_KEY as SECRET_KEY_CONFIG
+from .SECRET_KEY import SECRET_KEY as SECRET_KEY_CONFIG
 
 USE_L10N = False
 
@@ -122,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 

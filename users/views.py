@@ -9,51 +9,46 @@ from .forms import ChangedUserCreationForm,\
     UserAppendingForm, LoginForm
 from users.models import User
 
+from errors_utils.errors_processing import gen_errors_list
+
 
 def register(request):
     '''
     Страница регистрации
     '''
+    errors_list = []
+
     if request.method == 'POST':
         form = ChangedUserCreationForm(request.POST)
 
-        try:
+        form_is_valid = form.is_valid()
+        no_form_custom_errors = form.custom_errors_catching(request)
+
+        print(form_is_valid)
+        print(no_form_custom_errors)
+
+        if form.is_valid() and form.custom_errors_catching(request):
+            print('form is valid')
             form.save(commit=False)
-        except:
-            return redirect('/register')
 
-        cleaned_data = form.cleaned_data
-        print(f'{cleaned_data}')
+            cleaned_data = form.cleaned_data
+            print(f'{cleaned_data}')
 
-        pw1 = cleaned_data.get('password1')
+            pw1 = cleaned_data.get('password1')
 
-        email = cleaned_data.get('email')
-        phonenum = request.POST.get('phonenum')
+            email = cleaned_data.get('email')
+            phonenum = request.POST.get('phonenum')
 
-        name = cleaned_data.get('name')
-        surname = cleaned_data.get('surname')
-        patronymic = cleaned_data.get('patronymic')
+            name = cleaned_data.get('name')
+            surname = cleaned_data.get('surname')
+            patronymic = cleaned_data.get('patronymic')
 
-        region = cleaned_data.get('region')
-        liveplace = request.POST.get('liveplace')
+            region = cleaned_data.get('region')
+            liveplace = request.POST.get('liveplace')
 
-        allow_politics_and_processing = cleaned_data.get(
-            'allow_politics_and_processing')
+            birthdate_strfed = cleaned_data.get('birthdate')\
+                .strftime('%Y-%m-%d')
 
-        birthdate = cleaned_data.get('birthdate')
-        birthdate_strfed = cleaned_data.get('birthdate')\
-            .strftime('%Y-%m-%d')
-
-        def valid_age(age: date) -> bool:
-            today = datetime.now().date()
-            days_of_life = (today-age).days
-
-            if days_of_life > 0:
-                return True
-            else:
-                return False
-
-        if allow_politics_and_processing and valid_age(birthdate):
             created_user = User.objects.create_user(
                 username=email, password=pw1, email=email,
                 phonenum=phonenum, name=name,
@@ -63,14 +58,22 @@ def register(request):
                 region=region,
                 allow_politics_and_processing=True)
 
+            print(created_user)
+
             login_user(request, user=created_user)
+
             return redirect('/register2')
 
         else:
-            return redirect('/register')
+            print('not valid')
+            errors_as_data = form.errors.as_data()
+            errors_list = gen_errors_list(errors_as_data)
+
+    else:
+        form = ChangedUserCreationForm()
 
     return render(request, 'registration/register.html',
-                  {'form': ChangedUserCreationForm()})
+                  {'form': form, 'errors_list': errors_list})
 
 
 def user_append(request):
@@ -110,46 +113,32 @@ def login(request, login_method):
     '''
     Вход в аккаунт выбранным методом (см. login_select)
     '''
+    errors_list = []
+
     if request.method == 'POST':
         form = LoginForm(request.POST)
+        print(form.is_valid())
 
-        if form.is_valid():
-            cleaned_data = form.cleaned_data
+        if form.is_valid() and form.get_user(login_method):
+            founded_user = form.get_user(login_method)
+            print(type(founded_user))
 
-            email = cleaned_data.get('email')
-            phonenum = request.POST.get('phonenum')
-            password = cleaned_data.get('password')
+            login_user(request, founded_user)
+            return redirect('/')
 
-            global founded_user
-            founded_user = ''
+        else:
+            errors_as_data = form.errors.as_data()
+            print(errors_as_data)
+            errors_list = gen_errors_list(errors_as_data)
+            print(f'errors_list is {errors_list}')
 
-            if email and login_method == 'email':
-                try:
-                    founded_user = User.objects\
-                        .filter(email=email)[0]
-
-                except:
-                    return redirect(f'/login/{login_method}')
-
-            elif phonenum and login_method == 'phonenum':
-                try:
-                    founded_user = User.objects\
-                        .filter(phonenum=phonenum)[0]
-
-                except:
-                    return redirect(f'/login/{login_method}')
-
-            if check_password(password, founded_user.password):
-                login_user(request, user=founded_user)
-
-                return redirect('/')
-
-            else:
-                return redirect(f'/login/{login_method}')
+    else:
+        form = LoginForm()
 
     return render(request, 'registration/login.html',
-                  {'form': LoginForm(),
-                   'login_method': login_method})
+                  {'form': form,
+                   'login_method': login_method,
+                   'errors_list': errors_list})
 
 
 def logout(request):

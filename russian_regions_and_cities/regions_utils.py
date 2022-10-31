@@ -1,5 +1,5 @@
 from .sources.russia_cities_dict import russia_cities_dict
-from .sources.russia_regions_array import russia_reg_dict
+from .sources.russia_regions_dict import russia_reg_dict
 
 
 def gen_regions_list() -> list:
@@ -43,3 +43,18 @@ def get_region_full_name(short_name: str) -> str:
         for k, v in dict.items():
             if v == short_name:
                 return k
+
+
+def valid_liveplace(region: str, city: str) -> bool:
+    '''
+    Функция валидирует выбранный город
+    '''
+    for dict in russia_cities_dict:
+        for k, v in dict.items():
+            if k == region:
+                cities_list = v
+
+                if city in cities_list:
+                    return True
+                else:
+                    return False

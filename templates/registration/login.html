@@ -24,4 +24,10 @@
     {% csrf_token %}
     <button type="submit">submit</button>
 </form>
+
+{% if errors_list %}
+{% for error in errors_list %}
+    <p>{{ error }}</p>
+{% endfor %}
+{% endif %}
 {% endblock content %}
