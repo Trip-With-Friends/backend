@@ -8,6 +8,7 @@ from django.dispatch import receiver
 
 from phonenumber_field.modelfields import PhoneNumberField
 from russian_regions_and_cities.regions_utils import *
+from russian_regions_and_cities.sources.russia_cities_dict import russia_cities_dict
 
 
 class User(AbstractUser):
@@ -23,16 +24,21 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)
     phonenum = PhoneNumberField(region=None, unique=True)
-    region = models.CharField(
-        max_length=5,
-        choices=gen_regions_list(),
-        blank=False,
-        null=False,
-        default=''
-    )
+    # region = models.CharField(
+    #     max_length=5,
+    #     choices=gen_regions_list(),
+    #     blank=False,
+    #     null=False,
+    #     default=''
+    # )
 
-    liveplace = models.CharField(
-        max_length=50, blank=False, default='')
+    # liveplace = models.CharField(
+    #     max_length=50, blank=False, default='')
+
+    region = models.ForeignKey(
+        'Region', on_delete=models.SET_NULL, null=True)
+    liveplace = models.ForeignKey(
+        'City', on_delete=models.SET_NULL, null=True)
     description = models.TextField(
         blank=True, max_length=1000)
     not_twf_exp = models.TextField(
@@ -42,15 +48,9 @@ class User(AbstractUser):
 
     def get_age(self) -> int:
         today = datetime.now().date()
-        days_of_life = (today-self.birthdate).days
+        days_of_life = (today - self.birthdate).days
 
-        return days_of_life//365
-
-    def get_region_full_name(self) -> str:
-        short_name = self.region
-        full_name = get_region_full_name(short_name)
-
-        return full_name
+        return days_of_life // 365
 
     def get_photo_path(self) -> str:
         photo = self.photo
@@ -58,6 +58,45 @@ class User(AbstractUser):
         path = f'/media/users_thumbnails/{photo_basename}'
 
         return path
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100)
+    region = models.ForeignKey('Region', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+
+class Region(models.Model):
+    name = models.CharField(max_length=100)
+    short_name = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+
+def write_regions_db(
+        regions_list: list = russia_reg_dict):
+    for region_dict in regions_list:
+        for name, short_name in region_dict.items():
+            Region.objects.create(
+                name=name, short_name=short_name)
+
+    print('regions written!')
+
+
+def write_cities_db(
+        cities_with_regions: list = russia_cities_dict):
+
+    for region_cities_list in cities_with_regions:
+        for region_name, cities_list in region_cities_list.items():
+            region = Region.objects.filter(name=region_name)[0]
+
+            for city in cities_list:
+                City.objects.create(name=city, region=region)
+
+    print('cities writen!')
 
 
 @receiver(models.signals.pre_delete, sender=User)

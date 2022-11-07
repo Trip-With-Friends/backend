@@ -1,11 +1,8 @@
-from datetime import date, datetime
-
 from django.shortcuts import redirect, render
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth import login as login_user
 from django.contrib.auth import logout as logout_user
 
-from .forms import ChangedUserCreationForm,\
+from .forms import ChangedUserCreationForm, \
     UserAppendingForm, LoginForm
 from users.models import User
 
@@ -13,9 +10,9 @@ from errors_utils.errors_processing import gen_errors_list
 
 
 def register(request):
-    '''
+    """
     Страница регистрации
-    '''
+    """
     errors_list = []
 
     if request.method == 'POST':
@@ -44,9 +41,9 @@ def register(request):
             patronymic = cleaned_data.get('patronymic')
 
             region = cleaned_data.get('region')
-            liveplace = request.POST.get('liveplace')
+            liveplace = form.get_city_obj()
 
-            birthdate_strfed = cleaned_data.get('birthdate')\
+            birthdate_strfed = cleaned_data.get('birthdate') \
                 .strftime('%Y-%m-%d')
 
             created_user = User.objects.create_user(
@@ -77,9 +74,9 @@ def register(request):
 
 
 def user_append(request):
-    '''
+    """
     Дополнение пользователя описанием и фотографией
-    '''
+    """
     user = request.user
 
     if request.method == 'POST':
@@ -103,16 +100,16 @@ def user_append(request):
 
 
 def login_select(request):
-    '''
+    """
     Выбор метода входа в аккаунт (по номеру телефона или email)
-    '''
+    """
     return render(request, 'registration/login_select.html')
 
 
 def login(request, login_method):
-    '''
+    """
     Вход в аккаунт выбранным методом (см. login_select)
-    '''
+    """
     errors_list = []
 
     if request.method == 'POST':
@@ -121,16 +118,13 @@ def login(request, login_method):
 
         if form.is_valid() and form.get_user(login_method):
             founded_user = form.get_user(login_method)
-            print(type(founded_user))
 
             login_user(request, founded_user)
             return redirect('/')
 
         else:
             errors_as_data = form.errors.as_data()
-            print(errors_as_data)
             errors_list = gen_errors_list(errors_as_data)
-            print(f'errors_list is {errors_list}')
 
     else:
         form = LoginForm()
@@ -142,18 +136,18 @@ def login(request, login_method):
 
 
 def logout(request):
-    '''
-    Выход и аккаунта
-    '''
+    """
+    Выход из аккаунта
+    """
     logout_user(request)
 
     return redirect('/register')
 
 
 def delete_user(request):
-    '''
+    """
     Удаление аккаунта
-    '''
+    """
     user = request.user
 
     if request.method == 'POST':
@@ -167,7 +161,7 @@ def delete_user(request):
 
 
 def cabinet(request):
-    '''
+    """
     Личный кабинет
-    '''
+    """
     return render(request, 'registration/cabinet.html')

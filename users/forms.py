@@ -5,18 +5,46 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.hashers import check_password
 
-from .models import User
+from .models import User, Region, City
 from phonenumber_field.formfields import PhoneNumberField
 from russian_regions_and_cities.regions_utils import valid_liveplace, get_region_full_name
 
 
+# class RegionChoiceField(forms.ModelChoiceField):
+#     def label_from_instance(self, obj):
+#         return obj.short_name
+
+
 class ChangedUserCreationForm(UserCreationForm):
+    liveplace = forms.CharField(max_length=100, required=True)
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ['surname', 'name', 'patronymic',
                   'birthdate', 'email', 'phonenum',
-                  'region', 'liveplace',
+                  'region',
                   'allow_politics_and_processing']
+
+    def get_city_obj(self):
+        cleaned_data = self.cleaned_data
+        city = cleaned_data.get('liveplace')
+        region = cleaned_data.get('region')
+
+        if (region and city) is not None:
+            city_object = City.objects.\
+                filter(region=region).filter(name=city)[0]
+
+            return city_object
+
+
+    def valid_city(self) -> bool:
+        try:
+            self.get_city_obj()
+            return True
+
+        except:
+            return False
+
 
     def custom_errors_catching(self, request):
         cleaned_data = self.cleaned_data
@@ -24,8 +52,6 @@ class ChangedUserCreationForm(UserCreationForm):
         allow_politics = request.POST.get(
             'allow_politics_and_processing')
         birthdate = cleaned_data.get('birthdate')
-        region = cleaned_data.get('region')
-        liveplace = cleaned_data.get('liveplace')
 
         print(cleaned_data)
 
@@ -51,11 +77,8 @@ class ChangedUserCreationForm(UserCreationForm):
                 "Дата рождения введена неверно"
             )
 
-        region_full_name = get_region_full_name(region)
-
         # Проверка корректности места жительства
-        if not valid_liveplace(
-                region_full_name, liveplace):
+        if not self.valid_city():
             self.add_error(
                 "liveplace",
                 "Такого города/села/деревни нет в базе данных"
