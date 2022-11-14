@@ -1,0 +1,27 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %} Меню {% endblock title %}
+{% block header %} Меню {% endblock header %}
+
+{% block content %}
+    <p>
+        <a href="{% url 'city_selector_no_city' %}">
+            Куда пойти?
+        </a>
+    </p>
+    <p>
+        <a href="">
+            Сбор багажа
+        </a>
+    </p>
+    <p>
+        <a href="">
+            FAQ
+        </a>
+    </p>
+    <p>
+        <a href="{% url 'calculator_no_city' %}">
+            Калькулятор бюджета
+        </a>
+    </p>
+{% endblock content %}

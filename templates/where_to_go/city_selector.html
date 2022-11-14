@@ -1,0 +1,63 @@
+{% extends 'layout/layout.html' %}
+
+{% load static %}
+
+{% block title %} Куда пойти? {% endblock title %}
+{% block header %} Куда пойти? {% endblock header %}
+
+{% block content %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.region }}
+        {{ form.city }}
+
+        <select id="city-select"></select>
+
+        <button type="submit"> Найти </button>
+    </form>
+
+    {% if city_is_selected %}
+        {% for category in categories %}
+            <a href="{% url 'cat_viewer' region_short_name=region_name city_name=city_name category=category.code_name %}">
+                {{ category.name }}
+            </a>
+        {% endfor %}
+
+        {% for category_places in category_places_list %}
+            {% for category, places_list in category_places.items %}
+                <div>
+                    <p>Лучшие {{ category.get_text_name }}</p>
+
+                    {% for place in places_list %}
+                        <p>{{ place.name }}</p>
+                    {% endfor %}
+
+                    {% if places_list %}
+                        <a href="{% url 'cat_viewer' region_short_name=region_name city_name=city_name category=category.code_name %}">
+                            Смотреть все
+                        </a>
+                    {% else %}
+                        <p>Ничего не найдено</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <a href="{% url 'add_place' region_short_name=region_name city_name=city_name %}">
+            Добавить объект
+        </a>
+    
+    {% else %}
+        <p>{{ first_article.header }}</p>
+        
+        {% for hashtag in first_article.get_hashtags_list %}
+            <p>#{{ hashtag.hashtag }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <a href="{% url 'cabinet' %}">Личный кабинет</a>
+    <a href="{% url 'logout' %}">Выйти из аккаунта</a>
+    <a href="{% url 'delete_user' %}">Удалить аккаунт</a>
+
+    <script type="module" src="{% static 'js/select_place_category.js' %}"></script>
+{% endblock content %}

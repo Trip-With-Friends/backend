@@ -1,15 +1,15 @@
 import { gen_cities_list, reg_full_name } from './regions_and_cities/regions_utils.js'
 
-const city_btn = document.getElementById('btn add-city')
-const village_btn = document.getElementById('btn add-village')
+
 const liveplace_select_bar = document.getElementById('liveplace-select')
 const liveplace_field = document.getElementById('id_liveplace')
 const region_select_bar = document.getElementById('id_region')
 
+console.log(liveplace_field)
+
 
 //liveplace_select_bar.style.display = 'none'
 liveplace_field.style.display = 'none'
-
 
 //generate an option tags for city select
 function generate_city_options() {
@@ -31,6 +31,11 @@ document.addEventListener('input', function (event) {
 
     if (event.target.id == 'id_region') {
         generate_city_options()
+
+        let selected_value = liveplace_select_bar.options[liveplace_select_bar.selectedIndex].value
+        liveplace_field.value = selected_value
+
+        console.log(selected_value)
 
     } else if (event.target.id == 'liveplace-select') {
         let selected_value = liveplace_select_bar.options[liveplace_select_bar.selectedIndex].value

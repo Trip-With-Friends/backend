@@ -1,0 +1,21 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %} Калькулятор бюджета {% endblock title %}
+{% block header %} Калькулятор бюджета {% endblock header %}
+
+{% block content %}
+    <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit">Посчитать</button>
+
+        {% if form.errors %}
+            {% for error in form.errors %}
+                {{ error }}
+            {% endfor %}
+        {% endif %}
+
+    </form>
+
+    {{ calculated }}
+{% endblock content %}

@@ -26,7 +26,7 @@ class ChangedUserCreationForm(UserCreationForm):
                   'allow_politics_and_processing']
 
     def get_city_obj(self):
-        cleaned_data = self.cleaned_data
+        cleaned_data = self.cleaned_data()
         city = cleaned_data.get('liveplace')
         region = cleaned_data.get('region')
 
@@ -36,15 +36,18 @@ class ChangedUserCreationForm(UserCreationForm):
 
             return city_object
 
-
     def valid_city(self) -> bool:
         try:
-            self.get_city_obj()
+            city = City.objects.\
+                filter(region=self.cleaned_data.get('region')).\
+                filter(name=self.cleaned_data.get('liveplace'))[0]
+
+            print(f'city is {city}')
+
             return True
 
         except:
             return False
-
 
     def custom_errors_catching(self, request):
         cleaned_data = self.cleaned_data

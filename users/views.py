@@ -4,7 +4,7 @@ from django.contrib.auth import logout as logout_user
 
 from .forms import ChangedUserCreationForm, \
     UserAppendingForm, LoginForm
-from users.models import User
+from users.models import City, User
 
 from errors_utils.errors_processing import gen_errors_list
 
@@ -41,7 +41,9 @@ def register(request):
             patronymic = cleaned_data.get('patronymic')
 
             region = cleaned_data.get('region')
-            liveplace = form.get_city_obj()
+            liveplace = City.objects.\
+                filter(region=region).\
+                filter(name=cleaned_data.get('liveplace'))[0]
 
             birthdate_strfed = cleaned_data.get('birthdate') \
                 .strftime('%Y-%m-%d')

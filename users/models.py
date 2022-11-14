@@ -10,6 +10,8 @@ from phonenumber_field.modelfields import PhoneNumberField
 from russian_regions_and_cities.regions_utils import *
 from russian_regions_and_cities.sources.russia_cities_dict import russia_cities_dict
 
+from where_to_go.models import Place, PlaceCategory
+
 
 class User(AbstractUser):
     id = models.UUIDField(default=uuid4, primary_key=True)
@@ -24,16 +26,6 @@ class User(AbstractUser):
 
     email = models.EmailField(unique=True)
     phonenum = PhoneNumberField(region=None, unique=True)
-    # region = models.CharField(
-    #     max_length=5,
-    #     choices=gen_regions_list(),
-    #     blank=False,
-    #     null=False,
-    #     default=''
-    # )
-
-    # liveplace = models.CharField(
-    #     max_length=50, blank=False, default='')
 
     region = models.ForeignKey(
         'Region', on_delete=models.SET_NULL, null=True)
@@ -66,6 +58,42 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_city_places(self, category_code_name: str):
+        try:
+            cities_places = Place.objects.\
+                filter(city=self).only('name', 'id')
+
+            category = PlaceCategory.objects.filter(
+                code_name=category_code_name).only('id')[0]
+
+            return cities_places.filter(
+                category=category)
+
+        except:
+            return None
+
+    def get_all_places_dict(self) -> dict:
+        try:
+            cities_places = Place.objects.\
+                filter(city=self).\
+                select_related('name').\
+                values('name')
+
+            categories = PlaceCategory.objects.all()
+
+            final_list = []
+
+            for category in categories.iterator():
+                cities_category_list = cities_places.\
+                    filter(category=category)[:3]
+
+                final_list.append({category: cities_category_list})
+
+            return final_list
+
+        except:
+            return None
 
 
 class Region(models.Model):

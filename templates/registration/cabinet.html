@@ -15,6 +15,6 @@
     <p>{{ user.not_twf_exp }}</p>
     <img src="{{ user.get_photo_path }}" alt="Фото профиля">
 
-    <a href="{% url 'home' %}">На главную</a>
+    <a href="{% url 'city_selector_no_city' %}">На главную</a>
     <a href="{% url 'delete_user' %}">Удалить аккаунт</a>
 {% endblock content %}
